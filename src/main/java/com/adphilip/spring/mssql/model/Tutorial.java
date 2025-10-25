@@ -1,4 +1,4 @@
-package com.bezkoder.spring.mssql.model;
+package com.adphilip.spring.mssql.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

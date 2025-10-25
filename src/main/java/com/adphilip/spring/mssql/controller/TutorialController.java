@@ -1,4 +1,4 @@
-package com.bezkoder.spring.mssql.controller;
+package com.adphilip.spring.mssql.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bezkoder.spring.mssql.model.Tutorial;
-import com.bezkoder.spring.mssql.repository.TutorialRepository;
+import com.adphilip.spring.mssql.model.Tutorial;
+import com.adphilip.spring.mssql.repository.TutorialRepository;
 
 @CrossOrigin(origins = "http://localhost:8081")
 @RestController
