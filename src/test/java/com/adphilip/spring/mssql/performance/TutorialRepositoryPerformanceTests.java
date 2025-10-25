@@ -27,8 +27,8 @@ public class TutorialRepositoryPerformanceTests {
     private TutorialRepository tutorialRepository;
 
     private static final int BATCH_SIZE = 1000;
-    private static final int WARMUP_ITERATIONS = 2;
-    private static final int TEST_ITERATIONS = 5;
+    private static final int WARMUP_ITERATIONS = 10;
+    private static final int TEST_ITERATIONS = 20;
 
     @BeforeEach
     void setUp() {
@@ -140,11 +140,13 @@ public class TutorialRepositoryPerformanceTests {
         double avg = durations.stream().mapToLong(Long::valueOf).average().orElse(0.0);
         long min = durations.stream().mapToLong(Long::valueOf).min().orElse(0);
         long max = durations.stream().mapToLong(Long::valueOf).max().orElse(0);
+        double tps = avg > 0 ? 1000.0 / avg : 0.0; // Convert ms to TPS
 
         System.out.println("\nPerformance Statistics for: " + operation);
         System.out.println("Average time: " + String.format("%.2f", avg) + " ms");
         System.out.println("Min time: " + min + " ms");
         System.out.println("Max time: " + max + " ms");
+        System.out.println("Transactions per second (TPS): " + String.format("%.2f", tps));
         System.out.println("Sample size: " + durations.size() + " iterations");
     }
 }

@@ -6,16 +6,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 
 @Entity
-@Table(name = "tutorials")
+@Table(name = "tutorials", indexes = {
+    @Index(name = "idx_published", columnList = "published")
+})
 public class Tutorial {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long id;
-
-  @Column(name = "title")
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private long id;  @Column(name = "title")
   private String title;
 
   @Column(name = "description")
