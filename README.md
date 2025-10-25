@@ -1,5 +1,58 @@
 # Spring Boot + SQL Server example: CRUD Operations Rest API
 
+## Project Information
+- Name: `spring-boot-sql-server`
+- Group ID: `com.adphilip`
+- Artifact ID: `spring-boot-sql-server`
+- Version: `0.0.1-SNAPSHOT`
+- Description: Spring Boot + SQL Server (MSSQL) example with JPA
+- Java Version: 21
+
+## Project Structure
+```
+src/
+├── main/
+│   ├── java/
+│   │   └── com/adphilip/spring/mssql/
+│   │       ├── SpringBootSqlServerApplication.java
+│   │       ├── controller/
+│   │       │   └── TutorialController.java
+│   │       ├── model/
+│   │       │   └── Tutorial.java
+│   │       └── repository/
+│   │           └── TutorialRepository.java
+│   └── resources/
+│       └── application.properties
+└── test/
+    ├── java/
+    │   └── com/adphilip/spring/mssql/
+    │       └── SpringBootSqlServerApplicationTests.java
+    └── resources/
+        └── application.properties
+```
+
+## Dependencies
+1. Spring Boot Starters:
+   - `spring-boot-starter-web`: Web application support
+   - `spring-boot-starter-data-jpa`: JPA for database operations
+   - `spring-boot-starter-actuator`: Application monitoring
+   - `spring-boot-starter-test`: Testing support
+
+2. Database:
+   - `mssql-jdbc`: SQL Server driver (runtime scope)
+   - `h2`: H2 database (test scope)
+
+3. Testing & Performance:
+   - JMH Framework (test scope):
+     * `jmh-core`: 1.37
+     * `jmh-generator-annprocess`: 1.37
+
+## Build Configuration
+- Build Tool: Maven
+- Plugins:
+  * `spring-boot-maven-plugin`: Spring Boot support
+  * `maven-compiler-plugin`: Compilation with JMH annotation processing
+
 For more detail, please visit:
 > [Spring Boot CRUD Operations example with SQL Server](https://www.bezkoder.com/spring-boot-sql-server/)
 
@@ -71,7 +124,33 @@ The application has been tested for performance with the following results:
 Note: These performance metrics were gathered in the following test environment:
 
 Test Environment Specifications:
-- Database: H2 in-memory database
+- Database: 
+  * Production: Microsoft SQL Server
+    - Used for actual deployment
+    - Configured through application.properties
+    - Full RDBMS capabilities
+    - Persistent storage
+    
+  * Testing: H2 in-memory database
+    - Version: Latest (included with Spring Boot)
+    - Mode: In-memory for fast test execution
+    - Features used:
+      * Compatible SQL syntax with SQL Server
+      * Automatic schema generation
+      * In-memory storage for fast testing
+      * No persistence between runs
+      * Console available at /h2-console (when enabled)
+    - Configuration in test/resources/application.properties:
+      * URL: jdbc:h2:mem:testdb
+      * Username: sa
+      * Password: (empty)
+      * DDL auto-update enabled
+    - Benefits:
+      * Fast test execution
+      * No external dependencies
+      * Lightweight
+      * SQL Server compatibility
+      * Perfect for unit/integration tests
 - Java Version: Spring Boot 3.5.0
 - Operating System: macOS
 - Test Framework: 

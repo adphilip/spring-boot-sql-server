@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.adphilip</groupId>
-	<artifactId>spring-boot-sql-server</artifactId>
+	<artifactId>spring-boot-sql-server-h2</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>spring-boot-sql-server</name>
-	<description>Spring Boot + SQL Server (MSSQL) example with JPA</description>
+	<name>spring-boot-sql-server-h2</name>
+	<description>Spring Boot + SQL Server (MSSQL) with JPA, featuring H2 in-memory database for testing and performance benchmarking</description>
 	<properties>
 		<java.version>21</java.version>
 	</properties>
