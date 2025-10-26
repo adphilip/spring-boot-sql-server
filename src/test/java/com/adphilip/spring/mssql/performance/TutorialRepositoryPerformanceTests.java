@@ -15,16 +15,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @DataJpaTest
 @TestPropertySource(properties = {
     "spring.jpa.hibernate.ddl-auto=create-drop",
     "spring.jpa.show-sql=false"
 })
-public class TutorialRepositoryPerformanceTests {
+class TutorialRepositoryPerformanceTests {
 
     @Autowired
     private TutorialRepository tutorialRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(TutorialRepositoryPerformanceTests.class);
 
     private static final int BATCH_SIZE = 1000;
     private static final int WARMUP_ITERATIONS = 10;
@@ -142,11 +146,12 @@ public class TutorialRepositoryPerformanceTests {
         long max = durations.stream().mapToLong(Long::valueOf).max().orElse(0);
         double tps = avg > 0 ? 1000.0 / avg : 0.0; // Convert ms to TPS
 
-        System.out.println("\nPerformance Statistics for: " + operation);
-        System.out.println("Average time: " + String.format("%.2f", avg) + " ms");
-        System.out.println("Min time: " + min + " ms");
-        System.out.println("Max time: " + max + " ms");
-        System.out.println("Transactions per second (TPS): " + String.format("%.2f", tps));
-        System.out.println("Sample size: " + durations.size() + " iterations");
+    logger.info("");
+    logger.info("Performance Statistics for: {}", operation);
+    logger.info("Average time: {} ms", String.format("%.2f", avg));
+    logger.info("Min time: {} ms", min);
+    logger.info("Max time: {} ms", max);
+    logger.info("Transactions per second (TPS): {}", String.format("%.2f", tps));
+    logger.info("Sample size: {} iterations", durations.size());
     }
 }
