@@ -157,19 +157,257 @@ Run both Back-end & Front-end in one place:
 
 ## Performance Test Results
 
-The application has been tested for performance with the following results:
+The application has been tested for performance with both SQL Server and H2 databases with optimized configurations:
 
-### Read Operations (findByPublished)
-- Average response time: 8.80 ms
-- Minimum response time: 4 ms
-- Maximum response time: 19 ms
-- Transactions per second (TPS): ~114 read operations/second
-- Sample size: 5 iterations
+### H2 In-Memory Performance (October 26, 2025) - ⚡ OPTIMIZED
+Testing against H2 in-memory database with full Hibernate optimizations:
+- **Average response time:** 1.90 ms
+- **Minimum response time:** 1 ms
+- **Maximum response time:** 4 ms
+- **Transactions per second (TPS):** 526.32
+- **Sample size:** 20 iterations
+- **Batch insert:** 1000 records successfully inserted
 
-### Write Operations (Bulk Insert)
-- Total records inserted: 1000
-- Total execution time: ~20.146 seconds
-- Transactions per second (TPS): ~50 write operations/second
+### SQL Server Performance (October 26, 2025)
+Testing against actual SQL Server database running in Docker (localhost:1434):
+- **Average response time:** 5.50 ms
+- **Minimum response time:** 2 ms
+- **Maximum response time:** 50 ms
+- **Transactions per second (TPS):** 181.82
+- **Sample size:** 20 iterations
+- **Batch insert:** 1000 records successfully inserted
+
+### Performance Comparison: H2 vs SQL Server
+
+| Metric | H2 (Optimized) | SQL Server | Winner |
+|--------|----------------|-----------|---------|
+| **Average Time** | 1.90 ms | 5.50 ms | **H2 is 189% faster** ⚡ |
+| **TPS** | 526.32 | 181.82 | **H2 has 189% higher throughput** 🚀 |
+| **Min Time** | 1 ms | 2 ms | **H2 (50% faster)** |
+| **Max Time** | 4 ms | 50 ms | **H2 (92% more stable)** |
+
+### Key Findings
+- **H2 is significantly faster** as expected for an in-memory database - almost **3x faster** than SQL Server!
+- **Critical optimization:** Both databases now have matching configurations:
+  * Database indexing (`idx_published` on `published` column)
+  * Hibernate query plan cache (2048 entries)
+  * Connection pooling (HikariCP with 20 max connections)
+  * Batch processing (batch_size=50)
+  * Hibernate statistics enabled
+- **Before optimization:** H2 was incorrectly slower (15.55ms vs 5.50ms) due to missing optimizations
+- **After optimization:** H2 achieves expected in-memory performance (1.90ms)
+
+### Recommendations
+- **Use H2 for:**
+  * Development and testing (ultra-fast, no setup required)
+  * Unit/integration tests (526 TPS throughput)
+  * Prototyping and demos
+- **Use SQL Server for:**
+  * Production deployments (data persistence, ACID compliance)
+  * Multi-user environments
+  * Enterprise features (backups, replication, security)
+
+## Database Configuration Profiles
+
+The application supports multiple database profiles for easy switching between environments:
+
+### Available Profiles
+1. **sqlserver** - Production SQL Server database
+2. **h2** - In-memory H2 database for testing
+
+### Profile Configuration Files
+- `application.properties` - Main configuration (sets active profile)
+- `application-sqlserver.properties` - SQL Server specific settings
+- `application-h2.properties` - H2 specific settings
+
+### Switching Between Databases
+
+**Option 1: Edit application.properties**
+```properties
+# Set to 'sqlserver' or 'h2'
+spring.profiles.active=sqlserver
+```
+
+**Option 2: Command Line**
+```bash
+# Run with SQL Server
+./mvnw spring-boot:run -Dspring-boot.run.profiles=sqlserver
+
+# Run with H2
+./mvnw spring-boot:run -Dspring-boot.run.profiles=h2
+
+# Run tests with SQL Server
+./mvnw test -Dspring.profiles.active=sqlserver
+
+# Run tests with H2
+./mvnw test -Dspring.profiles.active=h2
+
+# Run specific performance test with H2
+./mvnw test -Dtest=TutorialRepositoryPerformanceTests -Dspring.profiles.active=h2
+```
+
+**Option 3: Environment Variable**
+```bash
+export SPRING_PROFILES_ACTIVE=h2
+./mvnw spring-boot:run
+```
+
+### SQL Server Configuration
+- **URL:** jdbc:sqlserver://localhost:1434
+- **Database:** adphilip_db
+- **Encryption:** Enabled with self-signed certificate
+- **Dialect:** SQLServerDialect
+- **DDL Auto:** update
+- **Connection Pool:** HikariCP (max 20, min idle 10)
+
+### H2 Configuration
+- **URL:** jdbc:h2:mem:testdb
+- **Mode:** In-memory
+- **Dialect:** H2Dialect
+- **DDL Auto:** create-drop
+- **Connection Pool:** HikariCP (max 10, min idle 5)
+
+## SQL Server Setup with Docker
+
+### Prerequisites
+- Docker Desktop installed on your Mac
+
+### Initial Setup
+
+**1. Pull SQL Server Docker Image**
+```bash
+docker pull mcr.microsoft.com/mssql/server:2022-latest
+```
+
+**2. Start SQL Server Container**
+```bash
+docker run -e 'ACCEPT_EULA=Y' \
+  -e 'MSSQL_SA_PASSWORD=Str0ngP@ssw0rd!#2025' \
+  -p 1434:1433 \
+  --name sqlserver \
+  -d mcr.microsoft.com/mssql/server:2022-latest
+```
+
+**3. Create Database and User**
+
+Create a file named `setup-db.sql`:
+```sql
+-- Create database
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'adphilip_db')
+BEGIN
+    CREATE DATABASE adphilip_db;
+END
+GO
+
+USE adphilip_db;
+GO
+
+-- Create login
+IF NOT EXISTS (SELECT * FROM sys.server_principals WHERE name = 'adphilip')
+BEGIN
+    CREATE LOGIN adphilip WITH PASSWORD = 'Str0ngP@ssw0rd!#2025';
+END
+GO
+
+-- Create user
+IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = 'adphilip')
+BEGIN
+    CREATE USER adphilip FOR LOGIN adphilip;
+END
+GO
+
+-- Grant permissions
+ALTER ROLE db_owner ADD MEMBER adphilip;
+GO
+```
+
+Copy and execute the script:
+```bash
+# Copy SQL script to container
+docker cp setup-db.sql sqlserver:/tmp/setup-db.sql
+
+# Execute the script
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd \
+  -S localhost -U sa -P 'Str0ngP@ssw0rd!#2025' -C \
+  -i /tmp/setup-db.sql
+```
+
+### Docker Management Commands
+
+**Check Container Status**
+```bash
+# List running containers
+docker ps | grep sqlserver
+
+# View all containers (including stopped)
+docker ps -a | grep sqlserver
+```
+
+**Start/Stop/Restart Container**
+```bash
+# Stop SQL Server
+docker stop sqlserver
+
+# Start SQL Server (after stopped)
+docker start sqlserver
+
+# Restart SQL Server
+docker restart sqlserver
+```
+
+**View Logs**
+```bash
+# View container logs
+docker logs sqlserver
+
+# Follow logs in real-time
+docker logs -f sqlserver
+
+# View last 50 lines
+docker logs --tail 50 sqlserver
+```
+
+**Connect to SQL Server**
+```bash
+# Interactive SQL connection
+docker exec -it sqlserver /opt/mssql-tools18/bin/sqlcmd \
+  -S localhost -U adphilip -P 'Str0ngP@ssw0rd!#2025' -C -d adphilip_db
+
+# Run a quick query
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd \
+  -S localhost -U adphilip -P 'Str0ngP@ssw0rd!#2025' -C -d adphilip_db \
+  -Q "SELECT DB_NAME() AS CurrentDatabase, SYSTEM_USER AS CurrentUser;"
+```
+
+**Remove Container**
+```bash
+# Stop and remove container (to start fresh)
+docker rm -f sqlserver
+
+# Remove container and image
+docker rm -f sqlserver
+docker rmi mcr.microsoft.com/mssql/server:2022-latest
+```
+
+### Data Persistence (Optional)
+
+To persist data across container restarts, add a volume mount:
+```bash
+docker run -e 'ACCEPT_EULA=Y' \
+  -e 'MSSQL_SA_PASSWORD=Str0ngP@ssw0rd!#2025' \
+  -p 1434:1433 \
+  -v ~/sqlserver-data:/var/opt/mssql \
+  --name sqlserver \
+  -d mcr.microsoft.com/mssql/server:2022-latest
+```
+
+### Container Information
+- **Edition:** SQL Server 2022 Developer Edition (64-bit)
+- **Platform:** Linux (Ubuntu 22.04.5 LTS)
+- **Port Mapping:** `1434` (host) → `1433` (container)
+- **SA Password:** `Str0ngP@ssw0rd!#2025`
+- **Database:** `adphilip_db`
+- **User:** `adphilip` (db_owner permissions)
 
 Note: These performance metrics were gathered in the following test environment:
 
