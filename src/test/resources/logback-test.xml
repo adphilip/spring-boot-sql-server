@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <!-- Keep performance package at INFO to see metrics -->
+  <logger name="com.adphilip.spring.mssql.performance" level="INFO"/>
+
+  <!-- Reduce common test-time noise -->
+  <logger name="org.springframework" level="WARN"/>
+  <logger name="org.hibernate" level="WARN"/>
+  <logger name="org.hibernate.SQL" level="WARN"/>
+  <logger name="org.hibernate.type.descriptor.sql" level="WARN"/>
+  <logger name="com.zaxxer.hikari" level="WARN"/>
+
+  <!-- Default root set to WARN to keep output clean -->
+  <root level="WARN">
+    <appender-ref ref="CONSOLE" />
+  </root>
+
+  <!-- Console appender -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+</configuration>
