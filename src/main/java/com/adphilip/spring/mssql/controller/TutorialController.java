@@ -34,7 +34,7 @@ public class TutorialController {
 	@GetMapping("/tutorials")
 	public ResponseEntity<List<Tutorial>> getAllTutorials(@RequestParam(required = false) String title) {
 		try {
-			List<Tutorial> tutorials = new ArrayList<Tutorial>();
+			List<Tutorial> tutorials = new ArrayList<>();
 
 			if (title == null)
 				tutorialRepository.findAll().forEach(tutorials::add);
@@ -46,7 +46,7 @@ public class TutorialController {
 			}
 
 			return ResponseEntity.ok(tutorials);
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			return ResponseEntity.internalServerError().build();
 		}
 	}
@@ -65,10 +65,10 @@ public class TutorialController {
 	@PostMapping("/tutorials")
 	public ResponseEntity<Tutorial> createTutorial(@RequestBody Tutorial tutorial) {
 		try {
-			Tutorial _tutorial = tutorialRepository
+			Tutorial createdTutorial = tutorialRepository
 					.save(new Tutorial(tutorial.getTitle(), tutorial.getDescription(), false));
-			return ResponseEntity.status(HttpStatus.CREATED).body(_tutorial);
-		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.CREATED).body(createdTutorial);
+		} catch (RuntimeException e) {
 			return ResponseEntity.internalServerError().build();
 		}
 	}
@@ -78,11 +78,11 @@ public class TutorialController {
 		Optional<Tutorial> tutorialData = tutorialRepository.findById(id);
 
 		if (tutorialData.isPresent()) {
-			Tutorial _tutorial = tutorialData.get();
-			_tutorial.setTitle(tutorial.getTitle());
-			_tutorial.setDescription(tutorial.getDescription());
-			_tutorial.setPublished(tutorial.isPublished());
-			return ResponseEntity.ok(tutorialRepository.save(_tutorial));
+			Tutorial existingTutorial = tutorialData.get();
+			existingTutorial.setTitle(tutorial.getTitle());
+			existingTutorial.setDescription(tutorial.getDescription());
+			existingTutorial.setPublished(tutorial.isPublished());
+			return ResponseEntity.ok(tutorialRepository.save(existingTutorial));
 		} else {
 			return ResponseEntity.notFound().build();
 		}
@@ -93,7 +93,7 @@ public class TutorialController {
 		try {
 			tutorialRepository.deleteById(id);
 			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			return ResponseEntity.internalServerError().build();
 		}
 	}
@@ -103,7 +103,7 @@ public class TutorialController {
 		try {
 			tutorialRepository.deleteAll();
 			return ResponseEntity.noContent().build();
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			return ResponseEntity.internalServerError().build();
 		}
 	}
@@ -117,7 +117,7 @@ public class TutorialController {
 				return ResponseEntity.noContent().build();
 			}
 			return ResponseEntity.ok(tutorials);
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			return ResponseEntity.internalServerError().build();
 		}
 	}
