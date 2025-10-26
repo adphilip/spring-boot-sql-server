@@ -2,9 +2,9 @@ package com.adphilip.spring.mssql.performance;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.TestConstructor;
 
 import com.adphilip.spring.mssql.model.Tutorial;
 import com.adphilip.spring.mssql.repository.TutorialRepository;
@@ -23,16 +23,19 @@ import org.slf4j.LoggerFactory;
     "spring.jpa.hibernate.ddl-auto=create-drop",
     "spring.jpa.show-sql=false"
 })
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class TutorialRepositoryPerformanceTests {
-
-    @Autowired
-    private TutorialRepository tutorialRepository;
+    private final TutorialRepository tutorialRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(TutorialRepositoryPerformanceTests.class);
 
     private static final int BATCH_SIZE = 1000;
     private static final int WARMUP_ITERATIONS = 10;
     private static final int TEST_ITERATIONS = 20;
+
+    TutorialRepositoryPerformanceTests(TutorialRepository tutorialRepository) {
+        this.tutorialRepository = tutorialRepository;
+    }
 
     @BeforeEach
     void setUp() {

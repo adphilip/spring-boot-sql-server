@@ -7,22 +7,25 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.TestConstructor;
 
 import com.adphilip.spring.mssql.model.Tutorial;
 
 @DataJpaTest
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class TutorialRepositoryTests {
+    private final TestEntityManager entityManager;
 
-    @Autowired
-    private TestEntityManager entityManager;
-
-    @Autowired
-    private TutorialRepository tutorialRepository;
+    private final TutorialRepository tutorialRepository;
 
     private Tutorial testTutorial;
+
+    TutorialRepositoryTests(TestEntityManager entityManager, TutorialRepository tutorialRepository) {
+        this.entityManager = entityManager;
+        this.tutorialRepository = tutorialRepository;
+    }
 
     @BeforeEach
     void setUp() {

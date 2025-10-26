@@ -5,8 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tutorials", indexes = {
@@ -14,9 +14,11 @@ import jakarta.persistence.Index;
 })
 public class Tutorial {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;  @Column(name = "title")
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long id;
+
+  @Column(name = "title")
   private String title;
 
   @Column(name = "description")
@@ -29,7 +31,8 @@ public class Tutorial {
 
   }
 
-  public Tutorial(String title, String description, boolean published) {
+  public Tutorial(String title, String description,
+                  boolean published) {
     this.title = title;
     this.description = description;
     this.published = published;
@@ -65,7 +68,8 @@ public class Tutorial {
 
   @Override
   public String toString() {
-    return "Tutorial [id=" + id + ", title=" + title + ", desc=" + description + ", published=" + published + "]";
+    return "Tutorial [id=" + id + ", title=" + title + ", desc="
+        + description + ", published=" + published + "]";
   }
 
 }
