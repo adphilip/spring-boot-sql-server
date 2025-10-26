@@ -2,6 +2,7 @@ package com.adphilip.spring.mssql.performance;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -9,6 +10,7 @@ import org.springframework.test.context.TestConstructor;
 
 import com.adphilip.spring.mssql.model.Tutorial;
 import com.adphilip.spring.mssql.repository.TutorialRepository;
+import javax.sql.DataSource;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -20,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("sqlserver")
 @TestPropertySource(properties = {
     "spring.jpa.hibernate.ddl-auto=create-drop",
@@ -28,6 +31,7 @@ import org.slf4j.LoggerFactory;
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class TutorialRepositorySqlServerPerformanceTests {
     private final TutorialRepository tutorialRepository;
+    private final DataSource dataSource;
 
     private static final Logger logger = LoggerFactory.getLogger(TutorialRepositorySqlServerPerformanceTests.class);
 
@@ -35,8 +39,9 @@ class TutorialRepositorySqlServerPerformanceTests {
     private static final int WARMUP_ITERATIONS = 10;
     private static final int TEST_ITERATIONS = 20;
 
-    TutorialRepositorySqlServerPerformanceTests(TutorialRepository tutorialRepository) {
+    TutorialRepositorySqlServerPerformanceTests(TutorialRepository tutorialRepository, DataSource dataSource) {
         this.tutorialRepository = tutorialRepository;
+        this.dataSource = dataSource;
     }
 
     @BeforeEach
@@ -107,6 +112,16 @@ class TutorialRepositorySqlServerPerformanceTests {
 
         // Calculate and print statistics
         printStatistics("Find by Published (ms)", durations);
+    }
+
+    @Test
+    void verifyDataSourceIsSqlServer() throws Exception {
+        try (var connection = dataSource.getConnection()) {
+            String url = connection.getMetaData().getURL();
+            assertThat(url)
+                .as("Expected SQL Server JDBC URL")
+                .startsWith("jdbc:sqlserver");
+        }
     }
 
     private long performBatchInsert() {

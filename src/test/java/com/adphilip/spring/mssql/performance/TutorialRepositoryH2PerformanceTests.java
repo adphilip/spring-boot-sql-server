@@ -9,6 +9,7 @@ import org.springframework.test.context.TestConstructor;
 
 import com.adphilip.spring.mssql.model.Tutorial;
 import com.adphilip.spring.mssql.repository.TutorialRepository;
+import javax.sql.DataSource;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class TutorialRepositoryH2PerformanceTests {
     private final TutorialRepository tutorialRepository;
+    private final DataSource dataSource;
 
     private static final Logger logger = LoggerFactory.getLogger(TutorialRepositoryH2PerformanceTests.class);
 
@@ -35,8 +37,9 @@ class TutorialRepositoryH2PerformanceTests {
     private static final int WARMUP_ITERATIONS = 10;
     private static final int TEST_ITERATIONS = 20;
 
-    TutorialRepositoryH2PerformanceTests(TutorialRepository tutorialRepository) {
+    TutorialRepositoryH2PerformanceTests(TutorialRepository tutorialRepository, DataSource dataSource) {
         this.tutorialRepository = tutorialRepository;
+        this.dataSource = dataSource;
     }
 
     @BeforeEach
@@ -158,5 +161,15 @@ class TutorialRepositoryH2PerformanceTests {
     logger.info("Max time: {} ms", max);
     logger.info("Transactions per second (TPS): {}", String.format("%.2f", tps));
     logger.info("Sample size: {} iterations", durations.size());
+    }
+
+    @Test
+    void verifyDataSourceIsH2() throws Exception {
+        try (var connection = dataSource.getConnection()) {
+            String url = connection.getMetaData().getURL();
+            assertThat(url)
+                .as("Expected H2 JDBC URL")
+                .startsWith("jdbc:h2");
+        }
     }
 }

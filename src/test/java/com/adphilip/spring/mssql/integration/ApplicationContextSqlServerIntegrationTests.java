@@ -59,4 +59,15 @@ class ApplicationContextSqlServerIntegrationTests {
             }
         });
     }
+
+    @Test
+    void dataSourceIsSqlServerJdbcUrl() {
+        assertDoesNotThrow(() -> {
+            try (var connection = dataSource.getConnection()) {
+                String url = connection.getMetaData().getURL();
+                assertNotNull(url, "JDBC URL should not be null");
+                assertTrue(url.startsWith("jdbc:sqlserver"), "Expected SQL Server JDBC URL but got: " + url);
+            }
+        });
+    }
 }

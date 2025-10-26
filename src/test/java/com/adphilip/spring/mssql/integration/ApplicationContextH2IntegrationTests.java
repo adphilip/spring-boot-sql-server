@@ -24,9 +24,11 @@ class ApplicationContextH2IntegrationTests {
                                          TutorialRepository tutorialRepository,
                                          DataSource dataSource) {
         this.context = context;
-        this.tutorialRepository = tutorialRepository;
-        this.dataSource = dataSource;
-    }	@Test
+		this.tutorialRepository = tutorialRepository;
+		this.dataSource = dataSource;
+	}
+
+	@Test
 	void contextLoads() {
 		assertNotNull(context, "Application context should be loaded");
 	}
