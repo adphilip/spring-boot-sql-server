@@ -20,22 +20,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @DataJpaTest
-@ActiveProfiles("sqlserver")
+@ActiveProfiles("h2")
 @TestPropertySource(properties = {
     "spring.jpa.hibernate.ddl-auto=create-drop",
     "spring.jpa.show-sql=false"
 })
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-class TutorialRepositorySqlServerPerformanceTests {
+class TutorialRepositoryH2PerformanceTests {
     private final TutorialRepository tutorialRepository;
 
-    private static final Logger logger = LoggerFactory.getLogger(TutorialRepositorySqlServerPerformanceTests.class);
+    private static final Logger logger = LoggerFactory.getLogger(TutorialRepositoryH2PerformanceTests.class);
 
     private static final int BATCH_SIZE = 1000;
     private static final int WARMUP_ITERATIONS = 10;
     private static final int TEST_ITERATIONS = 20;
 
-    TutorialRepositorySqlServerPerformanceTests(TutorialRepository tutorialRepository) {
+    TutorialRepositoryH2PerformanceTests(TutorialRepository tutorialRepository) {
         this.tutorialRepository = tutorialRepository;
     }
 
@@ -152,7 +152,7 @@ class TutorialRepositorySqlServerPerformanceTests {
         double tps = avg > 0 ? 1000.0 / avg : 0.0; // Convert ms to TPS
 
     logger.info("");
-    logger.info("Performance Statistics for: {} [SQL Server]", operation);
+    logger.info("Performance Statistics for: {} [H2]", operation);
     logger.info("Average time: {} ms", String.format("%.2f", avg));
     logger.info("Min time: {} ms", min);
     logger.info("Max time: {} ms", max);

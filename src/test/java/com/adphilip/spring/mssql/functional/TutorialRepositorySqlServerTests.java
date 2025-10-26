@@ -16,30 +16,30 @@ import com.adphilip.spring.mssql.model.Tutorial;
 import com.adphilip.spring.mssql.repository.TutorialRepository;
 
 @DataJpaTest
-@ActiveProfiles("h2")
+@ActiveProfiles("sqlserver")
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-class TutorialRepositoryH2Tests {
+class TutorialRepositorySqlServerTests {
     private final TestEntityManager entityManager;
 
     private final TutorialRepository tutorialRepository;
 
     private Tutorial testTutorial;
 
-    TutorialRepositoryH2Tests(TestEntityManager entityManager, TutorialRepository tutorialRepository) {
+    TutorialRepositorySqlServerTests(TestEntityManager entityManager, TutorialRepository tutorialRepository) {
         this.entityManager = entityManager;
         this.tutorialRepository = tutorialRepository;
     }
 
     @BeforeEach
     void setUp() {
-        testTutorial = new Tutorial("Spring Boot Test", "Testing with H2", false);
+        testTutorial = new Tutorial("Spring Boot Test", "Testing with SQL Server", false);
         entityManager.persist(testTutorial);
         entityManager.flush();
     }
 
     @Test
     void shouldSaveTutorial() {
-        Tutorial tutorial = new Tutorial("JPA Test", "Testing JPA with H2", true);
+        Tutorial tutorial = new Tutorial("JPA Test", "Testing JPA with SQL Server", true);
         Tutorial savedTutorial = tutorialRepository.save(tutorial);
         
         assertThat(savedTutorial).isNotNull();

@@ -1,4 +1,4 @@
-package com.adphilip.spring.mssql;
+package com.adphilip.spring.mssql.integration;
 
 import com.adphilip.spring.mssql.repository.TutorialRepository;
 import org.junit.jupiter.api.Test;
@@ -13,16 +13,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("sqlserver")
-class SpringBootSqlServerApplicationSqlServerTests {
+class ApplicationContextSqlServerIntegrationTests {
 
     private final ApplicationContext context;
     private final TutorialRepository tutorialRepository;
     private final DataSource dataSource;
 
     @Autowired
-    SpringBootSqlServerApplicationSqlServerTests(ApplicationContext context,
-                                                 TutorialRepository tutorialRepository,
-                                                 DataSource dataSource) {
+    ApplicationContextSqlServerIntegrationTests(ApplicationContext context,
+                                                TutorialRepository tutorialRepository,
+                                                DataSource dataSource) {
         this.context = context;
         this.tutorialRepository = tutorialRepository;
         this.dataSource = dataSource;
